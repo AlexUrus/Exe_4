@@ -61,8 +61,9 @@ namespace Exercise_4.Controllers
 
             foreach (Vehicle vehicle in vehicles)
             {
-                markers.Add(new GMarkerGoogle(new PointLatLng(vehicle.Latitude, vehicle.Longitude),
-                    GMarkerGoogleType.blue_pushpin));
+                markers.Add(new GMarkerGoogle(new PointLatLng(vehicle.Latitude, vehicle.Longitude) ,
+                    GMarkerGoogleType.blue_pushpin)
+                { ToolTipText = vehicle.Title});
             }
         }
 

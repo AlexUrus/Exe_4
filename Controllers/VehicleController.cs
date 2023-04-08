@@ -25,7 +25,7 @@ namespace Exercise_4.Controllers
                     };
 
                     db.Vehicles.Add(vehicle);
-                    db.SaveChangesAsync();
+                    db.SaveChanges();
                 }
             });
         }
@@ -37,14 +37,15 @@ namespace Exercise_4.Controllers
                 using (var db = new Data.ApplicationContext())
                 {
                     var vehicle = db.Vehicles.FirstOrDefault(h => h.Title == marker.ToolTipText);
-                    if(vehicle != null)
+                    if (vehicle != null)
                     {
                         vehicle.Longitude = marker.Position.Lng;
                         vehicle.Latitude = marker.Position.Lat;
-                        db.SaveChangesAsync();
+                        db.SaveChanges();
                     }
                 }
             });
+                
         }
 
         public List<Vehicle> GetListVehicle()
