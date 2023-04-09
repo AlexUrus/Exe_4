@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,6 +19,7 @@ namespace Exercise_4
         private GMapOverlay Overlay;
         private GMapMarker CurrentMarker;
         MarkerController markerController;
+        OpenFileDialog dlg;
 
         public MainForm()
         {
@@ -25,6 +27,7 @@ namespace Exercise_4
         }
         private void MainForm_Load(object sender, EventArgs e)
         {
+            MenuMarkers.BringToFront();
             markerController = new MarkerController();
             List<GMapMarker> markers = markerController.GetListMarkers();
 
@@ -36,6 +39,9 @@ namespace Exercise_4
             }
 
             Map.Overlays.Add(Overlay);
+
+            dlg = new OpenFileDialog();
+            dlg.Filter = "NMEA Files (*.nmea) |*.nmea";
         }
 
         private void Map_Load(object sender, EventArgs e)
@@ -56,7 +62,7 @@ namespace Exercise_4
 
         private void Map_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
-            GMapMarker marker = markerController.CreateMarker(pointClick, e);
+            GMapMarker marker = markerController.CreateMarker(pointClick);
             Overlay.Markers.Add(marker);
         }
 
@@ -83,7 +89,7 @@ namespace Exercise_4
             item.ToolTipMode = MarkerTooltipMode.Never;
             if (CurrentMarker != null)
             {
-                markerController.UpdateMarker(CurrentMarker);
+                markerController.UpdateMarkerList(CurrentMarker);
             }
             CurrentMarker = null;
             Map.CanDragMap = true;
@@ -99,6 +105,38 @@ namespace Exercise_4
             }
         }
 
-        
+        private void ParseButton_Click(object sender, EventArgs e)
+        {
+            OpenMenuVehicles();
+            ParseButton.Enabled =false;
+        }
+
+        private void OpenMenuVehicles()
+        {
+            List<GMapMarker> markers = markerController.GetListMarkers();
+            foreach (var marker in markers)
+            {
+                ToolStripMenuItem menuItem = new ToolStripMenuItem(marker.ToolTipText);
+                menuItem.Click += new EventHandler(menuItem_Click);
+                MenuMarkers.Items.Add(menuItem);
+            }
+            MenuMarkers.Visible = true;
+        }
+
+        private void menuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+            dlg.ShowDialog();
+            string fileName = dlg.FileName;
+            string nmea = System.IO.File.ReadAllText(fileName);
+            CurrentMarker = Overlay.Markers.FirstOrDefault(m => m.ToolTipText == menuItem.Text);
+            markerController.ChangeLatLngMarker(nmea, CurrentMarker);
+            CurrentMarker = markerController.ChangeLatLngMarker(nmea, CurrentMarker);
+            Overlay.Markers.Add(CurrentMarker);
+            CurrentMarker = null;
+            MenuMarkers.Items.Clear();
+            MenuMarkers.Visible = false;
+            ParseButton.Enabled = true;
+        }
     }
 }

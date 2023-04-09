@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Exercise_4.Controllers
 {
-    internal class MapContoller
+    public class MapContoller
     {
     }
 }

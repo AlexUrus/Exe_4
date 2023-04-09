@@ -10,24 +10,24 @@ using System.Windows.Forms;
 using Exercise_4.Data;
 using System.Security.Cryptography;
 using Exercise_4.Models;
+using System.Drawing;
 
 namespace Exercise_4.Controllers
 {
     public class MarkerController
     {
         private List<GMapMarker> markers;
-        private VehicleController vehicleController;
+        private VehicleController vehicleController; 
 
         public MarkerController() 
         {
-            //дописать чтение из базы
             vehicleController = new VehicleController();
             ReadPositionVehicles(); //сомнительно
         }
-        public GMapMarker CreateMarker(PointLatLng pointClick, MouseEventArgs e)
+        public GMapMarker CreateMarker(PointLatLng pointClick)
         {
             GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue_pushpin);
-
+            marker.ToolTipText = pointClick.ToString();
             markers.Add(marker);
 
             vehicleController.AddVehicleToDb(marker);
@@ -38,16 +38,22 @@ namespace Exercise_4.Controllers
         {
 
         }
-        public void UpdateMarker(GMapMarker marker)
+        public void UpdateMarkerList(GMapMarker modifiedMarker)
         {
-            var index = markers.FindIndex(m => m.ToolTipText == marker.ToolTipText);
+            var index = markers.FindIndex(m => m.ToolTipText == modifiedMarker.ToolTipText);
             if (index >= 0)
             {
-                markers[index] = marker;
-                vehicleController.UpdateVehicleInDb(marker);
+                markers[index] = modifiedMarker;
+                vehicleController.UpdateVehicleInDb(modifiedMarker);
             }   
         }
 
+        public GMapMarker ChangeLatLngMarker(string nmea, GMapMarker marker)
+        {
+            PointLatLng pointLatLng = GPSReceiver.ParseGPGGA(nmea);
+            marker.Position = pointLatLng;
+            return marker;
+        }
         public List<GMapMarker> GetListMarkers()
         {
             return new List<GMapMarker>(markers);
@@ -66,6 +72,5 @@ namespace Exercise_4.Controllers
                 { ToolTipText = vehicle.Title});
             }
         }
-
     }
 }
