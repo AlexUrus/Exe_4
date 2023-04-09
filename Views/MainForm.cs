@@ -17,7 +17,7 @@ namespace Exercise_4
     public partial class MainForm : Form
     {
         private GMapOverlay Overlay;
-        private GMapMarker CurrentMarker;
+        private GMapPolygon Polygon;
         MarkerController markerController;
         OpenFileDialog dlg;
 
@@ -37,7 +37,7 @@ namespace Exercise_4
             {
                 Overlay.Markers.Add(mapMarker);
             }
-
+            AddPolygon();
             Map.Overlays.Add(Overlay);
 
             dlg = new OpenFileDialog();
@@ -62,13 +62,25 @@ namespace Exercise_4
 
         private void Map_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
+            CreateMarker(pointClick);
+        }
+        private void CreateMarker(PointLatLng pointClick)
+        {
             GMapMarker marker = markerController.CreateMarker(pointClick);
+
             Overlay.Markers.Add(marker);
+
+            Map.UpdateMarkerLocalPosition(marker);
+
+            if (Polygon.IsInside(marker.Position))
+            {
+                CreateMarkerContextMenu(marker);
+            }
         }
 
         private void Map_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
-            CurrentMarker = item;
+            markerController.CurrentMarker = item;
             if (e.Button == MouseButtons.Left)
             {
                 Map.CanDragMap = false;
@@ -86,12 +98,23 @@ namespace Exercise_4
 
         private void Map_OnMarkerLeave(GMapMarker item)
         {
+            bool isCalledActionsMarker = false;
             item.ToolTipMode = MarkerTooltipMode.Never;
-            if (CurrentMarker != null)
+
+            if (markerController.CurrentMarker != null) // разобраться с условием как лучше сделать
             {
-                markerController.UpdateMarkerList(CurrentMarker);
+                markerController.UpdateMarkerList(markerController.CurrentMarker);
+                if (Polygon.IsInside(markerController.CurrentMarker.Position))
+                {
+                    CreateMarkerContextMenu(markerController.CurrentMarker);
+                    isCalledActionsMarker = true;
+                }
             }
-            CurrentMarker = null;
+            if(!isCalledActionsMarker) 
+            {
+                markerController.CurrentMarker = null;
+            }
+
             Map.CanDragMap = true;
 
             Map.MouseMove -= new MouseEventHandler(Map_MouseMove);
@@ -99,16 +122,16 @@ namespace Exercise_4
 
         private void Map_MouseMove(object sender, MouseEventArgs e)
         {
-            if (CurrentMarker != null && e.Button == MouseButtons.Left)
+            if (markerController.CurrentMarker != null && e.Button == MouseButtons.Left)
             {
-                CurrentMarker.Position = Map.FromLocalToLatLng(e.X, e.Y);
+                markerController.CurrentMarker.Position = Map.FromLocalToLatLng(e.X, e.Y);
             }
         }
 
         private void ParseButton_Click(object sender, EventArgs e)
         {
             OpenMenuVehicles();
-            ParseButton.Enabled =false;
+            ParseButton.Enabled = false;
         }
 
         private void OpenMenuVehicles()
@@ -117,26 +140,91 @@ namespace Exercise_4
             foreach (var marker in markers)
             {
                 ToolStripMenuItem menuItem = new ToolStripMenuItem(marker.ToolTipText);
-                menuItem.Click += new EventHandler(menuItem_Click);
+                menuItem.Click += new EventHandler(MenuItem_Click);
                 MenuMarkers.Items.Add(menuItem);
             }
             MenuMarkers.Visible = true;
         }
 
-        private void menuItem_Click(object sender, EventArgs e)
+        private void MenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+
             dlg.ShowDialog();
+
             string fileName = dlg.FileName;
             string nmea = System.IO.File.ReadAllText(fileName);
-            CurrentMarker = Overlay.Markers.FirstOrDefault(m => m.ToolTipText == menuItem.Text);
-            markerController.ChangeLatLngMarker(nmea, CurrentMarker);
-            CurrentMarker = markerController.ChangeLatLngMarker(nmea, CurrentMarker);
-            Overlay.Markers.Add(CurrentMarker);
-            CurrentMarker = null;
+
+            markerController.CurrentMarker = Overlay.Markers.FirstOrDefault(m => m.ToolTipText == menuItem.Text);
+
+            markerController.ChangeLatLngMarker(nmea);
+
+            if (Polygon.IsInside(markerController.CurrentMarker.Position)) 
+            {
+                CreateMarkerContextMenu(markerController.CurrentMarker);
+            }
+
+            Overlay.Markers.Add(markerController.CurrentMarker);
+            markerController.CurrentMarker = null;
             MenuMarkers.Items.Clear();
             MenuMarkers.Visible = false;
             ParseButton.Enabled = true;
         }
+
+        private void AddPolygon()
+        {
+            Polygon = new GMapPolygon(new List<PointLatLng>
+            {
+                new PointLatLng(54.93109, 82.81769),
+                new PointLatLng(54.93109, 83.03123),
+                new PointLatLng(54.86752, 82.98592),
+                new PointLatLng(54.87503, 82.79228),
+            }, "MyPolygon")
+            {
+                Fill = new SolidBrush(Color.FromArgb(50, Color.Blue)),
+                Stroke = new Pen(Color.Blue, 1)
+            };
+            Overlay.Polygons.Add(Polygon);
+        }
+       
+        private void CreateMarkerContextMenu(GMapMarker marker)
+        {
+            markerController.CurrentMarker = marker;
+
+            ContextMenuStrip menu = new ContextMenuStrip();
+            ToolStripMenuItem menuItem1 = new ToolStripMenuItem("Диалоговое окно с информацией");
+            ToolStripMenuItem menuItem2 = new ToolStripMenuItem("Изменить цвет маркера");
+            ToolStripMenuItem menuItem3 = new ToolStripMenuItem("Создать новый маркер в случайной точке");
+
+            menuItem1.Click += DialogInfoMarker_Click;
+            menuItem2.Click += ChangeColorMarker_Click;
+            menuItem3.Click += CreateRandomMarker_Click;
+
+            menu.Items.Add(menuItem1);
+            menu.Items.Add(menuItem2);
+            menu.Items.Add(menuItem3);
+
+            GPoint gpoint = Map.FromLatLngToLocal(marker.Position);
+            Point point = new Point((int)gpoint.X, (int)gpoint.Y);
+
+            menu.Show(Map, point);
+        }
+        private void ChangeColorMarker_Click(object sender, EventArgs e)
+        {
+            Overlay.Markers.Remove(markerController.CurrentMarker);
+            GMapMarker marker = markerController.ChangeColorMarker();
+            Overlay.Markers.Add(marker);
+        }
+        private void CreateRandomMarker_Click(object sender, EventArgs e)
+        {
+            GMapMarker marker = markerController.CreateRandomMarker();
+            Overlay.Markers.Add(marker);
+        }
+        private void DialogInfoMarker_Click(object sender, EventArgs e)
+        {
+            markerController.ShowDialogMarker();
+        }
+
+
     }
 }

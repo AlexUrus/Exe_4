@@ -81,8 +81,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\GPSDataController.cs" />
-    <Compile Include="Controllers\MapContoller.cs" />
     <Compile Include="Controllers\MarkerController.cs" />
     <Compile Include="Controllers\VehicleController.cs" />
     <Compile Include="Data\ApplicationContext.cs" />
@@ -91,7 +89,6 @@
       <DependentUpon>202304081007198_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\GPSInfo.cs" />
     <Compile Include="Controllers\GpsReceiver.cs" />
     <Compile Include="Models\Vehicle.cs" />
     <Compile Include="Views\MainForm.cs">

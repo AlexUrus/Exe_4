@@ -59,7 +59,7 @@
             this.Map.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.Map.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.Map.ShowTileGridLines = false;
-            this.Map.Size = new System.Drawing.Size(730, 450);
+            this.Map.Size = new System.Drawing.Size(801, 450);
             this.Map.TabIndex = 0;
             this.Map.Zoom = 0D;
             this.Map.OnMapDoubleClick += new GMap.NET.WindowsForms.MapDoubleClick(this.Map_OnMapDoubleClick);
@@ -72,11 +72,11 @@
             // ParseButton
             // 
             this.ParseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ParseButton.Location = new System.Drawing.Point(736, 12);
+            this.ParseButton.Location = new System.Drawing.Point(655, 12);
             this.ParseButton.Name = "ParseButton";
-            this.ParseButton.Size = new System.Drawing.Size(60, 23);
+            this.ParseButton.Size = new System.Drawing.Size(133, 25);
             this.ParseButton.TabIndex = 1;
-            this.ParseButton.Text = "button1";
+            this.ParseButton.Text = "Переместить по GPS ";
             this.ParseButton.UseVisualStyleBackColor = true;
             this.ParseButton.Click += new System.EventHandler(this.ParseButton_Click);
             // 
@@ -84,9 +84,10 @@
             // 
             this.MenuMarkers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.MenuMarkers.Dock = System.Windows.Forms.DockStyle.None;
-            this.MenuMarkers.Location = new System.Drawing.Point(593, 9);
+            this.MenuMarkers.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
+            this.MenuMarkers.Location = new System.Drawing.Point(657, 49);
             this.MenuMarkers.Name = "MenuMarkers";
-            this.MenuMarkers.Size = new System.Drawing.Size(128, 24);
+            this.MenuMarkers.Size = new System.Drawing.Size(126, 25);
             this.MenuMarkers.TabIndex = 2;
             this.MenuMarkers.Text = "menuStrip1";
             this.MenuMarkers.Visible = false;

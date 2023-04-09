@@ -1,28 +1,23 @@
-﻿using GMap.NET;
-using GMap.NET.WindowsForms.Markers;
+﻿using Exercise_4.Models;
+using GMap.NET;
 using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Exercise_4.Data;
-using System.Security.Cryptography;
-using Exercise_4.Models;
-using System.Drawing;
 
 namespace Exercise_4.Controllers
 {
     public class MarkerController
     {
         private List<GMapMarker> markers;
-        private VehicleController vehicleController; 
-
+        private readonly VehicleController vehicleController;
+        public GMapMarker CurrentMarker;
+        public bool MarkerIsDragging;
         public MarkerController() 
         {
             vehicleController = new VehicleController();
-            ReadPositionVehicles(); //сомнительно
+            ReadPositionVehicles();
         }
         public GMapMarker CreateMarker(PointLatLng pointClick)
         {
@@ -48,18 +43,89 @@ namespace Exercise_4.Controllers
             }   
         }
 
-        public GMapMarker ChangeLatLngMarker(string nmea, GMapMarker marker)
+        public void ChangeLatLngMarker(string nmea)
         {
             PointLatLng pointLatLng = GPSReceiver.ParseGPGGA(nmea);
-            marker.Position = pointLatLng;
-            return marker;
+            CurrentMarker.Position = pointLatLng;
         }
         public List<GMapMarker> GetListMarkers()
         {
             return new List<GMapMarker>(markers);
         }
+        public void ShowDialogMarker()
+        {
+            MessageBox.Show(
+                "Информация о маркере" +
+                $"\r\n Ш: {CurrentMarker.Position.Lat}" +
+                $"\r\n Д: {CurrentMarker.Position.Lng}" +
+                $"\r\n    {CurrentMarker.ToolTipText}");
+            CurrentMarker = null;
+        }
 
-        private void ReadPositionVehicles() // сомнительно
+        public GMapMarker ChangeColorMarker()
+        {
+            Random random = new Random();
+            int numberColor = random.Next( 0, 3 );
+            GMapMarker marker;
+            switch (numberColor)
+            {
+                case 0:
+                    {
+                        marker = new GMarkerGoogle(CurrentMarker.Position, GMarkerGoogleType.red_pushpin)
+                        {
+                            ToolTipText = CurrentMarker.ToolTipText
+                        };
+                        CurrentMarker = marker;
+                        break;
+                    }
+                case 1: 
+                    {
+                        marker = new GMarkerGoogle(CurrentMarker.Position, GMarkerGoogleType.pink_pushpin)
+                        {
+                            ToolTipText = CurrentMarker.ToolTipText
+                        };
+                        CurrentMarker = marker;
+                        break;
+                    }
+                case 2:
+                    {
+                        marker = new GMarkerGoogle(CurrentMarker.Position, GMarkerGoogleType.yellow_pushpin) 
+                        { 
+                            ToolTipText = CurrentMarker.ToolTipText 
+                        };
+                        CurrentMarker = marker;
+                        break;
+                    }
+                case 3:
+                    {
+                        marker = new GMarkerGoogle(CurrentMarker.Position, GMarkerGoogleType.purple_pushpin) 
+                        { 
+                            ToolTipText = CurrentMarker.ToolTipText 
+                        };
+                        CurrentMarker = marker;
+                        break;
+                    }
+            }
+            //UpdateMarkerList(CurrentMarker);
+            return CurrentMarker;
+        }
+
+        public GMapMarker CreateRandomMarker()
+        {
+            Random rnd = new Random();
+            Random rnd2 = new Random();
+            PointLatLng pointLatLng = new PointLatLng(rnd.NextDouble() * 90.0, rnd2.NextDouble() * 90.0);
+            GMapMarker marker = new GMarkerGoogle(pointLatLng, GMarkerGoogleType.blue_pushpin)
+            {
+                ToolTipText = pointLatLng.ToString()
+            };
+
+            markers.Add(marker);
+
+            vehicleController.AddVehicleToDb(marker);
+            return marker;
+        }
+        private void ReadPositionVehicles() 
         {
             markers = new List<GMapMarker>();
 

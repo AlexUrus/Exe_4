@@ -14,6 +14,7 @@ namespace Exercise_4.Data
             base(ConfigurationManager.
                 ConnectionStrings["DBConnectString"].
                 ConnectionString) {
+            SeedData();
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -25,13 +26,11 @@ namespace Exercise_4.Data
             modelBuilder.Entity<Vehicle>().Property(h => h.Title).IsRequired();
             modelBuilder.Entity<Vehicle>().Property(h => h.Latitude).IsRequired();
             modelBuilder.Entity<Vehicle>().Property(h => h.Longitude).IsRequired();
-           
-
         }
 
         public void SeedData()
         {
-            if (Vehicles.Count() == 0)
+            if(Vehicles.Count() == 0)
             {
                 var vehicles = new List<Vehicle>
                 {
@@ -44,6 +43,7 @@ namespace Exercise_4.Data
                 Vehicles.AddRange(vehicles);
                 SaveChanges();
             }
+            
         }
 
 
