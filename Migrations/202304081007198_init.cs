@@ -1,8 +1,7 @@
 ﻿namespace Exercise_4.Migrations
 {
-    using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class init : DbMigration
     {
         public override void Up()

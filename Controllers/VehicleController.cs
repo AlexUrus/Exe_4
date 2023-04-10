@@ -1,10 +1,7 @@
 ﻿using Exercise_4.Models;
 using GMap.NET.WindowsForms;
-using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Exercise_4.Controllers

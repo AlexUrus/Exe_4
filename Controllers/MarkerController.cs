@@ -13,7 +13,7 @@ namespace Exercise_4.Controllers
         private List<GMapMarker> markers;
         private readonly VehicleController vehicleController;
         public GMapMarker CurrentMarker;
-        public bool MarkerIsDragging; // нужно реализовать либо убрать
+        public bool MarkerIsDragging; 
         public MarkerController() 
         {
             vehicleController = new VehicleController();
@@ -21,8 +21,10 @@ namespace Exercise_4.Controllers
         }
         public GMapMarker CreateMarker(PointLatLng pointClick)
         {
-            GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue_pushpin);
-            marker.ToolTipText = pointClick.ToString();
+            GMapMarker marker = new GMarkerGoogle(pointClick, GMarkerGoogleType.blue_pushpin)
+            {
+                ToolTipText = pointClick.ToString()
+            };
             markers.Add(marker);
 
             vehicleController.AddVehicleToDb(marker);
@@ -120,8 +122,10 @@ namespace Exercise_4.Controllers
         public GMapMarker CreateRandomMarker()
         {
             Random rnd = new Random();
-            Random rnd2 = new Random();
-            PointLatLng pointLatLng = new PointLatLng(rnd.NextDouble() * 90.0, rnd2.NextDouble() * 90.0);
+            double lat = rnd.NextDouble() * 90.0;
+            double lng = lat/Math.PI;
+
+            PointLatLng pointLatLng = new PointLatLng(lat, lng);
             GMapMarker marker = new GMarkerGoogle(pointLatLng, GMarkerGoogleType.blue_pushpin)
             {
                 ToolTipText = pointLatLng.ToString()

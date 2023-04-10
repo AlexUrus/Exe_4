@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace Exercise_4.Data
 {
