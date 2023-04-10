@@ -66,7 +66,7 @@ namespace Exercise_4.Controllers
 
         public void UpdateMarkerList(GMapMarker marker)
         {
-            markerController.UpdateMarkerList(marker);
+            markerController.UpdateMarkerInList(marker);
         }
 
         public void AddMarkersInMenu(MenuStrip menu)

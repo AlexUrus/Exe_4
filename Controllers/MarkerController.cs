@@ -32,7 +32,7 @@ namespace Exercise_4.Controllers
             return marker;
         }
 
-        public void UpdateMarkerList(GMapMarker modifiedMarker)
+        public void UpdateMarkerInList(GMapMarker modifiedMarker)
         {
             var index = markers.FindIndex(m => m.ToolTipText == modifiedMarker.ToolTipText);
             if (index >= 0)
