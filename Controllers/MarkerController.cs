@@ -13,7 +13,7 @@ namespace Exercise_4.Controllers
         private List<GMapMarker> markers;
         private readonly VehicleController vehicleController;
         public GMapMarker CurrentMarker;
-        public bool MarkerIsDragging;
+        public bool MarkerIsDragging; // нужно реализовать либо убрать
         public MarkerController() 
         {
             vehicleController = new VehicleController();
@@ -29,10 +29,7 @@ namespace Exercise_4.Controllers
             
             return marker;
         }
-        public void RemoveMarker() 
-        {
 
-        }
         public void UpdateMarkerList(GMapMarker modifiedMarker)
         {
             var index = markers.FindIndex(m => m.ToolTipText == modifiedMarker.ToolTipText);
@@ -48,10 +45,12 @@ namespace Exercise_4.Controllers
             PointLatLng pointLatLng = GPSReceiver.ParseGPGGA(nmea);
             CurrentMarker.Position = pointLatLng;
         }
+
         public List<GMapMarker> GetListMarkers()
         {
             return new List<GMapMarker>(markers);
         }
+
         public void ShowDialogMarker()
         {
             MessageBox.Show(
@@ -106,10 +105,18 @@ namespace Exercise_4.Controllers
                         break;
                     }
             }
-            //UpdateMarkerList(CurrentMarker);
             return CurrentMarker;
         }
 
+        public void RemoveMarkerInList(GMapMarker marker)
+        {
+
+            var index = markers.FindIndex(m => m.ToolTipText == marker.ToolTipText);
+            if (index >= 0)
+            {
+                vehicleController.RemoveVehicleInDB(markers[index]);
+            }
+        }
         public GMapMarker CreateRandomMarker()
         {
             Random rnd = new Random();
@@ -125,6 +132,7 @@ namespace Exercise_4.Controllers
             vehicleController.AddVehicleToDb(marker);
             return marker;
         }
+
         private void ReadPositionVehicles() 
         {
             markers = new List<GMapMarker>();
