@@ -41,10 +41,7 @@ namespace Exercise_4.Data
 
                 Vehicles.AddRange(vehicles);
                 SaveChanges();
-            }
-            
+            }           
         }
-
-
     }
 }

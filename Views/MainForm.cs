@@ -12,18 +12,22 @@ namespace Exercise_4
     public partial class MainForm : Form
     {
         private MapController mapController;
+
         public MainForm()
         {
             InitializeComponent();
         }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             mapController = new MapController(Map);
         }
+
         private void Map_OnMapDoubleClick(PointLatLng pointClick, MouseEventArgs e)
         {
             mapController.CreateMarker(pointClick);
         }
+
         private void Map_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
             mapController.CurrentMarker = item;
@@ -79,6 +83,5 @@ namespace Exercise_4
                 MenuMarkers.BringToFront();
             }
         }
-
     }
 }

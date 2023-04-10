@@ -27,22 +27,6 @@ namespace Exercise_4.Controllers
             });
         }
 
-        public async void RemoveVehicleInDB(GMapMarker marker)
-        {
-            await Task.Run(() =>
-            {
-                using (var db = new Data.ApplicationContext())
-                {
-                    var vehicle = db.Vehicles.FirstOrDefault(h => h.Title == marker.ToolTipText);
-                    if (vehicle != null)
-                    {
-                        db.Vehicles.Remove(vehicle);
-                        db.SaveChanges();
-                    }
-                }
-            });
-        }
-
         public async void UpdateVehicleInDb(GMapMarker marker)
         {
             await Task.Run(() =>
@@ -69,10 +53,5 @@ namespace Exercise_4.Controllers
                 return vehicleList;
             }
         }
-
-        
-
-
-
     }
 }

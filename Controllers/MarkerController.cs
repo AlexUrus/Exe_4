@@ -17,7 +17,7 @@ namespace Exercise_4.Controllers
         public MarkerController() 
         {
             vehicleController = new VehicleController();
-            ReadPositionVehicles();
+            CreateMarkerList();
         }
         public GMapMarker CreateMarker(PointLatLng pointClick)
         {
@@ -46,11 +46,6 @@ namespace Exercise_4.Controllers
         {
             PointLatLng pointLatLng = GPSReceiver.ParseGPGGA(nmea);
             CurrentMarker.Position = pointLatLng;
-        }
-
-        public List<GMapMarker> GetListMarkers()
-        {
-            return new List<GMapMarker>(markers);
         }
 
         public void ShowDialogMarker()
@@ -110,15 +105,6 @@ namespace Exercise_4.Controllers
             return CurrentMarker;
         }
 
-        public void RemoveMarkerInList(GMapMarker marker)
-        {
-
-            var index = markers.FindIndex(m => m.ToolTipText == marker.ToolTipText);
-            if (index >= 0)
-            {
-                vehicleController.RemoveVehicleInDB(markers[index]);
-            }
-        }
         public GMapMarker CreateRandomMarker()
         {
             Random rnd = new Random();
@@ -137,17 +123,26 @@ namespace Exercise_4.Controllers
             return marker;
         }
 
-        private void ReadPositionVehicles() 
+        public List<GMapMarker> GetListMarkers()
+        {
+            return new List<GMapMarker>(markers);
+        }
+
+        private List<Vehicle> ReadPositionVehicles()
+        { 
+            return vehicleController.GetListVehicle();     
+        }
+
+        private void CreateMarkerList()
         {
             markers = new List<GMapMarker>();
-
-            List<Vehicle> vehicles = vehicleController.GetListVehicle();
+            List<Vehicle> vehicles = ReadPositionVehicles();
 
             foreach (Vehicle vehicle in vehicles)
             {
-                markers.Add(new GMarkerGoogle(new PointLatLng(vehicle.Latitude, vehicle.Longitude) ,
+                markers.Add(new GMarkerGoogle(new PointLatLng(vehicle.Latitude, vehicle.Longitude),
                     GMarkerGoogleType.blue_pushpin)
-                { ToolTipText = vehicle.Title});
+                { ToolTipText = vehicle.Title });
             }
         }
     }

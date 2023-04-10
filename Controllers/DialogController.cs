@@ -9,7 +9,6 @@ namespace Exercise_4.Controllers
 {
     public class DialogController
     {
-
         private readonly OpenFileDialog openFileDialog;
 
         public DialogController()

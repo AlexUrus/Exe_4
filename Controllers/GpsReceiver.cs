@@ -8,7 +8,6 @@ namespace Exercise_4
     {
         public static PointLatLng ParseGPGGA(string nmea) 
         {
-
             string[] parts = nmea.Split(',');
 
             if (parts[0] != "$GPGGA" || parts.Length < 10)
@@ -27,7 +26,5 @@ namespace Exercise_4
 
             return new PointLatLng(latitude,longitude);
         }
-
     }
-
 }

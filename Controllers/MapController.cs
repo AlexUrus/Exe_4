@@ -5,17 +5,16 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Exercise_4.Controllers
 {
     public class MapController
     {
         private readonly GMapControl Map;
-        private readonly MarkerController markerController;
-        private readonly GMapOverlay Overlay;
         private GMapPolygon Polygon;
+        private readonly GMapOverlay Overlay;
         private readonly DialogController dialogController;
+        private readonly MarkerController markerController;
         public GMapMarker CurrentMarker { 
             get
             {
@@ -36,6 +35,7 @@ namespace Exercise_4.Controllers
                 markerController.MarkerIsDragging = value;
             }
         }
+
         public MapController(GMapControl map)
         {
             Map = map;
@@ -63,54 +63,62 @@ namespace Exercise_4.Controllers
         {
             return markerController.GetListMarkers();
         }
+
         public void UpdateMarkerList(GMapMarker marker)
         {
             markerController.UpdateMarkerList(marker);
         }
+
         public void AddMarkersInMenu(MenuStrip menu)
         {
             dialogController.AddListInMenu(GetListMarkers(),menu);
+
             foreach (ToolStripMenuItem item in menu.Items)
             {
                 item.Click += new EventHandler(MenuMarkersItem_Click);
             }
             menu.Visible = true;
         }
+
         private void MenuMarkersItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
-
-            string nmea = OpenReadNmea();
             List<GMapMarker> markers = markerController.GetListMarkers();
             CurrentMarker = markers.FirstOrDefault(m => m.ToolTipText == menuItem.Text);
 
+            string nmea = OpenReadNmea();
             MoveMarkerToNmea(nmea);
 
             Overlay.Markers.Add(CurrentMarker);
-            MenuStrip menu = (MenuStrip)menuItem.GetCurrentParent();
 
+            MenuStrip menu = (MenuStrip)menuItem.GetCurrentParent();
             menu.Visible = false;
         }
         public string OpenReadNmea()
         {
            return dialogController.ReadNmea();
         }
+
         public void MoveMarkerToNmea(string nmea)
         {
             markerController.ChangeLatLngMarker(nmea);
 
             OpenMarkerContextMenu(CurrentMarker);
         }
+
         public void OpenMarkerContextMenu(GMapMarker marker)
         {
             if (Polygon.IsInside(CurrentMarker.Position))
             {
                 ContextMenuStrip menuStrip = dialogController.CreateMarkerContextMenu();
+
                 menuStrip.Items[0].Click += new EventHandler(DialogInfoMarker_Click);
                 menuStrip.Items[1].Click += new EventHandler(ChangeColorMarker_Click);
                 menuStrip.Items[2].Click += new EventHandler(CreateRandomMarker_Click);
+
                 GPoint gpoint = Map.FromLatLngToLocal(marker.Position);
                 Point point = new Point((int)gpoint.X, (int)gpoint.Y);
+
                 menuStrip.Show(Map, point);
             } 
         }
@@ -130,16 +138,22 @@ namespace Exercise_4.Controllers
             Overlay.Markers.Remove(markerController.CurrentMarker);
 
             GMapMarker marker = markerController.ChangeColorMarker();
+
             Overlay.Markers.Add(marker);
+
             markerController.CurrentMarker = null;
 
         }
+
         public void CreateRandomMarker_Click(object sender, EventArgs e)
         {
             GMapMarker marker = markerController.CreateRandomMarker();
+
             Overlay.Markers.Add(marker);
+
             MessageBox.Show("Маркер создан: " + marker.Position);
         }
+
         public void DialogInfoMarker_Click(object sender, EventArgs e)
         {
             markerController.ShowDialogMarker();
@@ -169,7 +183,5 @@ namespace Exercise_4.Controllers
                 Overlay.Markers.Add(mapMarker);
             }
         }
-
-
     }
 }
